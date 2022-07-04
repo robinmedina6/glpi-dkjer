@@ -1,0 +1,51 @@
+version: '2'
+
+services:
+    glpi:
+        container_name : gl-glpi
+        build: .
+        ports:
+            - "3080:80"
+            - "3044:443"
+        links:
+            - mysql:db
+        env_file:
+            - ./glpi.env
+        volumes:
+            - glpi_data:/var/www/html/glpi
+            - ssl-glpi:/etc/ssl/glpi/
+            - aph-siteaval:/etc/apache2/sites-available
+
+    # Database container
+    mysql:
+        container_name : gl-msql
+        image: mariadb
+        ports:
+            - "3081:3306"
+        restart: always
+        env_file:
+            - ./glpi.env
+        volumes:
+            - mysql_data:/var/lib/mysql
+     
+    bdadmin:
+        container_name: bdadmin
+        image: phpmyadmin/phpmyadmin
+        restart: always
+        ports:
+         - 4001:80
+        environment:
+          PMA_HOST: mysql
+          TZ: America/Bogota
+          UPLOAD_LIMIT: 300M
+        restart: always
+        links:
+          - mysql
+
+volumes:
+    glpi_data: {}
+    ssl-glpi: {}
+    aph-siteaval: {}
+    mysql_data: {}
+    metabase-data: {}
+

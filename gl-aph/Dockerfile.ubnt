@@ -1,0 +1,35 @@
+FROM ubuntu:18.04
+#maintarinte
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update 
+RUN apt-get install -y --force-yes \
+  apache2 \
+  wget \
+  php libapache2-mod-php php-mysql \
+  php-mysql \
+  php-ldap \
+  php-xmlrpc \
+  curl \
+  php-curl \
+  php-gd \
+  php-mbstring \
+  php-simplexml \
+  php-xml \
+  php-apcu \
+  php-imap \
+  php-cas \
+  php-zip \
+  php-intl \
+  php-bz2
+
+RUN wget https://github.com/glpi-project/glpi/releases/download/9.5.2/glpi-9.5.2.tgz
+RUN tar xf glpi-9.5.2.tgz -C /var/www/html
+RUN chown -R www-data: /var/www/html/glpi/
+RUN apt install -y php-apcu php-bz2 php-cas php-gd php-imap php-intl php-ldap php-mbstring php-xmlrpc php-zip
+RUN a2enmod rewrite expires
+COPY glpi.conf /etc/apache2/conf-available/glpi.conf
+RUN a2enconf glpi
+RUN service apache2 restart
+#RUN tail -f /var/log/apache2/error.log -f /var/log/apache2/access.log
+WORKDIR /var/www/html
+EXPOSE 80

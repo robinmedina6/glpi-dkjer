@@ -1,0 +1,27 @@
+#con script
+el docker file y compose esta configurado para colocarle una variable de entorno que permite 
+decidir si con ssl o sin ssl
+si se coloca la variable de entorno GLPI_CERT en 1
+se ejecuta el servidor con ssl
+pero hay que entrar y crear el certificado manual ya que no es interactivo
+openssl req -x509 -nodes -days 9365 -newkey rsa:2048 -keyout /etc/ssl/glpi/private/glpi-selfsigned.key -out /etc/ssl/glpi/certs/glpi-selfsigned.crt
+#openssl x509 -in /etc/ssl/glpi/certs/glpi-selfsigned.crt -out /etc/ssl/glpi/certs/glpi-selfsigned.pem
+y reiniciar el server
+service apache2 restart
+
+hay que copiar la carpeta scripts
+
+docker cp scripts/ gl-glpi:/home/
+docker exec -it gl-glpi chmod +x /home/scripts/afterinstall/ejecutar.sh
+docker exec -it gl-glpi /home/scripts/afterinstall/ejecutar.sh
+docker exec -it gl-msql bash
+mysql -u root -p 
+grant select on mysql.time_zone_name to glpi;
+
+actualizar certificados
+docker cp scripts/ gl-glpi:/home/
+docker exec -it gl-glpi chmod +x /home/scripts/updatecerts/ejecutar.sh
+docker exec -it gl-glpi /home/scripts/updatecerts/ejecutar.sh
+
+
+
