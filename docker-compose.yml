@@ -3,23 +3,29 @@ version: '2'
 services:
     glpi:
         container_name : gl-glpi
-        build: .
+        image: diouxx/glpi
         ports:
             - "3080:80"
             - "3044:443"
-        links:
+        hostname: glpi
             - mysql:db
-        env_file:
-            - ./glpi.env
+        environment:
+            - VERSION_GLPI=9.5.6
         volumes:
             - glpi_data:/var/www/html/glpi
             - ssl-glpi:/etc/ssl/glpi/
             - aph-siteaval:/etc/apache2/sites-available
-
+            
     # Database container
     mysql:
         container_name : gl-msql
         image: mariadb
+        hostname: mariadb
+        environment:
+          - MARIADB_ROOT_PASSWORD=password
+          - MARIADB_DATABASE=glpidb
+          - MARIADB_USER=glpi_user
+          - MARIADB_PASSWORD=glpi
         ports:
             - "3081:3306"
         restart: always
@@ -37,7 +43,7 @@ services:
         environment:
           PMA_HOST: mysql
           TZ: America/Bogota
-          UPLOAD_LIMIT: 300M
+          UPLOAD_LIMIT: 3000M
         restart: always
         links:
           - mysql
